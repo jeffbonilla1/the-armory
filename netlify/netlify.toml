@@ -1,0 +1,17 @@
+[build]
+  functions = "netlify/functions"
+
+[functions]
+  directory = "netlify/functions"
+
+[functions."claude-proxy"]
+  timeout = 60
+
+[functions."create-checkout"]
+  timeout = 30
+
+[functions."get-access-code"]
+  timeout = 30
+
+[functions."validate-code"]
+  timeout = 30
