@@ -34,7 +34,7 @@ exports.handler = async (event) => {
     }
 
     // Generate access code from session ID
-    const code = 'TPC-' + session.id.slice(-8).toUpperCase();
+    const code = 'TAR-' + session.id.slice(-8).toUpperCase();
     const customerEmail = session.customer_details?.email;
 
     // Send email if we have an address
