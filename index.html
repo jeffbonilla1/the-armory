@@ -1,0 +1,1091 @@
+<!--
+Copyright © 2026 Jeff Bonilla
+All rights reserved.
+The Armory — Weapons Intelligence for Fiction Writers
+Unauthorized copying, distribution, modification, or use prohibited.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Armory — Weapons Intelligence for Fiction Writers</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;1,300&family=IBM+Plex+Serif:ital,wght@0,300;0,400;1,300;1,400&display=swap');
+
+:root {
+  --bg: #090c0f;
+  --surface: #0f1419;
+  --surface2: #151c23;
+  --border: #1e2a35;
+  --border-bright: #2a3d4f;
+  --text: #e2e8ed;
+  --text-dim: #8fa3b2;
+  --text-muted: #5a7a8a;
+  --accent: #4a7fa8;
+  --accent-dim: rgba(74,127,168,0.15);
+  --accent-glow: rgba(74,127,168,0.06);
+  --green: #4a8c6a;
+  --red: #a84040;
+  --steel: #8090a0;
+  --brass: #b8902a;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'IBM Plex Serif', serif;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.03) 2px,
+    rgba(0,0,0,0.03) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ═══════════ TITLEBAR ═══════════ */
+.titlebar {
+  height: 42px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.traffic-lights { display: flex; gap: 6px; }
+.tl { width: 12px; height: 12px; border-radius: 50%; opacity: 0.7; }
+.tl.red { background: #ff5f57; }
+.tl.yellow { background: #ffbd2e; }
+.tl.green { background: #28c840; }
+
+.app-title {
+  font-family: 'Bebas Neue', cursive;
+  font-size: 1.1rem;
+  letter-spacing: 0.15em;
+  color: var(--accent);
+  margin-left: 4px;
+}
+
+.app-subtitle {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--text-dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.bindery-link {
+  margin-left: auto;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.58rem;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+.bindery-link:hover { color: var(--accent); }
+
+/* ═══════════ TOOLBAR ═══════════ */
+.toolbar {
+  height: 48px;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.toolbar-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.62rem;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+select {
+  background: var(--bg);
+  border: 1px solid var(--border-bright);
+  color: var(--text);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  padding: 5px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s;
+}
+select:focus { border-color: var(--accent); }
+
+.toolbar-sep { width: 1px; height: 24px; background: var(--border); margin: 0 4px; }
+
+.btn-export {
+  margin-left: auto;
+  background: transparent;
+  border: 1px solid var(--border-bright);
+  color: var(--text-dim);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  padding: 5px 12px;
+  border-radius: 3px;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+.btn-export:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ═══════════ MAIN LAYOUT ═══════════ */
+.app-body { display: flex; flex: 1; overflow: hidden; }
+
+/* ═══════════ SIDEBAR ═══════════ */
+.sidebar {
+  width: 240px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.sidebar-header {
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sidebar-title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.btn-clear-all {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.58rem;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.btn-clear-all:hover { color: var(--red); }
+
+.history-list { flex: 1; overflow-y: auto; padding: 8px 0; }
+.history-list::-webkit-scrollbar { width: 4px; }
+.history-list::-webkit-scrollbar-track { background: transparent; }
+.history-list::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 2px; }
+
+.history-empty {
+  padding: 20px 16px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  font-style: italic;
+  line-height: 1.6;
+}
+
+.history-item {
+  padding: 10px 16px;
+  cursor: pointer;
+  border-left: 2px solid transparent;
+  transition: all 0.15s;
+}
+.history-item:hover { background: var(--surface2); border-left-color: var(--border-bright); }
+.history-item.active { background: var(--accent-glow); border-left-color: var(--accent); }
+
+.history-item-q {
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: var(--text);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+
+.history-item-meta {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.57rem;
+  color: var(--text-muted);
+  display: flex;
+  gap: 8px;
+}
+
+.badge {
+  display: inline-block;
+  padding: 1px 5px;
+  border-radius: 2px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.55rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.badge-firearms   { background: rgba(168,80,40,0.2);  color: #e0a080; }
+.badge-blades     { background: rgba(80,80,120,0.3);  color: #a0a0e0; }
+.badge-explosives { background: rgba(180,140,40,0.2); color: #e0c060; }
+.badge-tactical   { background: rgba(60,120,80,0.2);  color: #80c890; }
+.badge-military   { background: rgba(60,100,160,0.2); color: #80a8e0; }
+.badge-covert     { background: rgba(100,60,120,0.2); color: #c090e0; }
+
+/* ═══════════ MAIN PANEL ═══════════ */
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+.answer-area { flex: 1; overflow-y: auto; padding: 24px 28px; }
+.answer-area::-webkit-scrollbar { width: 5px; }
+.answer-area::-webkit-scrollbar-track { background: transparent; }
+.answer-area::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 2px; }
+
+/* ═══════════ WELCOME ═══════════ */
+.welcome { max-width: 620px; margin: 40px auto; text-align: center; }
+.welcome-icon { font-size: 2.4rem; margin-bottom: 16px; opacity: 0.7; }
+.welcome h2 {
+  font-family: 'Bebas Neue', cursive;
+  font-size: 2.2rem;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+.welcome p { color: var(--text-dim); font-size: 0.95rem; line-height: 1.7; margin-bottom: 24px; }
+.welcome-byline {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 28px;
+  font-style: italic;
+}
+.example-prompts { display: flex; flex-direction: column; gap: 10px; text-align: left; }
+.example-prompt {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  padding: 12px 14px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  cursor: pointer;
+  transition: all 0.15s;
+  line-height: 1.5;
+}
+.example-prompt:hover { border-color: var(--accent); color: var(--text); background: var(--surface2); }
+
+/* ═══════════ RESPONSE STYLES ═══════════ */
+.response-wrap { max-width: 780px; margin: 0 auto; }
+.response-header { margin-bottom: 20px; }
+.response-q {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  padding: 14px 16px;
+  border-radius: 4px;
+}
+.response-q-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.58rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 6px;
+}
+.response-q-text { font-size: 0.95rem; color: var(--text); line-height: 1.5; margin-bottom: 8px; }
+.response-meta-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.section {
+  margin-bottom: 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+}
+.section-num { font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; color: var(--accent); letter-spacing: 0.1em; }
+.section-title { font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.1em; }
+.section-body { padding: 16px; font-size: 0.9rem; line-height: 1.75; color: var(--text); }
+.section-body p { margin-bottom: 10px; }
+.section-body p:last-child { margin-bottom: 0; }
+
+.steps { padding: 12px 16px; display: flex; flex-direction: column; gap: 10px; }
+.step { display: flex; gap: 12px; align-items: flex-start; }
+.step-num { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; color: var(--accent); padding-top: 2px; flex-shrink: 0; }
+.step-text { font-size: 0.88rem; line-height: 1.6; color: var(--text); }
+
+.misconceptions { padding: 12px 16px; display: flex; flex-direction: column; gap: 12px; }
+.myth-block { border: 1px solid var(--border); border-radius: 3px; overflow: hidden; }
+.myth-line { padding: 10px 14px; background: rgba(168,64,64,0.08); font-size: 0.88rem; line-height: 1.5; color: var(--text-dim); }
+.reality-line { padding: 10px 14px; background: rgba(74,140,106,0.08); font-size: 0.88rem; line-height: 1.5; color: var(--text); border-top: 1px solid var(--border); }
+.myth-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-right: 8px;
+  padding: 2px 6px;
+  border-radius: 2px;
+}
+.myth-label.wrong { background: rgba(168,64,64,0.3); color: #e08080; }
+.myth-label.right  { background: rgba(74,140,106,0.3); color: #80c890; }
+
+.drama-table { padding: 12px 16px; }
+.drama-table table { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
+.drama-table th { font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); padding: 8px 10px; border-bottom: 1px solid var(--border); text-align: left; }
+.drama-table td { padding: 10px 10px; border-bottom: 1px solid var(--border); color: var(--text); line-height: 1.5; vertical-align: top; }
+.drama-table td:first-child { color: var(--accent); font-weight: 500; white-space: nowrap; }
+.drama-table tr:last-child td { border-bottom: none; }
+.cinematic-moment { margin-top: 12px; padding: 10px 14px; background: var(--accent-dim); border-left: 3px solid var(--accent); font-style: italic; font-size: 0.88rem; color: var(--text-dim); border-radius: 0 3px 3px 0; }
+
+.defense-list { padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; }
+.defense-item { display: flex; gap: 10px; align-items: flex-start; }
+.defense-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); margin-top: 7px; flex-shrink: 0; }
+.defense-text { font-size: 0.88rem; line-height: 1.6; color: var(--text); }
+
+.quick-ref { padding: 12px 16px; }
+.quick-ref table { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
+.quick-ref td { padding: 8px 10px; border-bottom: 1px solid var(--border); line-height: 1.5; color: var(--text); }
+.quick-ref td:first-child { color: var(--text-muted); font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; padding-right: 16px; }
+.quick-ref tr:last-child td { border-bottom: none; }
+
+.freeform-response { max-width: 680px; }
+.freeform-response p { font-size: 0.92rem; line-height: 1.8; color: var(--text); margin-bottom: 16px; }
+.freeform-response h3 { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); margin: 20px 0 8px; }
+.freeform-response strong { color: var(--text); }
+
+/* ═══════════ LOADING ═══════════ */
+.loading-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 200px; gap: 16px; }
+.loading-dots { display: flex; gap: 8px; }
+.loading-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); animation: pulse 1.2s ease-in-out infinite; }
+.loading-dot:nth-child(2) { animation-delay: 0.2s; }
+.loading-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes pulse { 0%, 80%, 100% { opacity: 0.2; transform: scale(0.8); } 40% { opacity: 1; transform: scale(1); } }
+.loading-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; color: var(--text-muted); letter-spacing: 0.1em; text-transform: uppercase; }
+
+/* ═══════════ INPUT BAR ═══════════ */
+.input-bar { background: var(--surface); border-top: 1px solid var(--border); padding: 14px 20px; flex-shrink: 0; }
+.input-wrap { display: flex; gap: 10px; max-width: 780px; margin: 0 auto; }
+textarea {
+  flex: 1;
+  background: var(--bg);
+  border: 1px solid var(--border-bright);
+  border-radius: 4px;
+  color: var(--text);
+  font-family: 'IBM Plex Serif', serif;
+  font-size: 0.9rem;
+  padding: 10px 14px;
+  resize: none;
+  outline: none;
+  min-height: 44px;
+  max-height: 120px;
+  line-height: 1.5;
+  transition: border-color 0.2s;
+}
+textarea:focus { border-color: var(--accent); }
+textarea::placeholder { color: var(--text-muted); font-style: italic; }
+.btn-send {
+  background: var(--accent);
+  border: none;
+  color: #fff;
+  font-family: 'Bebas Neue', cursive;
+  font-size: 0.95rem;
+  letter-spacing: 0.12em;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  height: 44px;
+  white-space: nowrap;
+}
+.btn-send:hover { background: #5a8fb8; }
+.btn-send:disabled { opacity: 0.4; cursor: not-allowed; }
+.input-hint { text-align: center; margin-top: 8px; font-family: 'IBM Plex Mono', monospace; font-size: 0.58rem; color: var(--text-muted); letter-spacing: 0.06em; }
+
+/* ═══════════ MOBILE ═══════════ */
+@media (max-width: 768px) {
+  body { overflow: auto; height: auto; min-height: 100vh; }
+  .app-subtitle { display: none; }
+  .toolbar { height: auto; flex-wrap: wrap; padding: 10px 12px; gap: 8px; }
+  .toolbar-sep { display: none; }
+  select { font-size: 0.7rem; padding: 6px 8px; max-width: 130px; }
+  .btn-export { margin-left: 0; }
+  .app-body { flex-direction: column; overflow: visible; }
+  .sidebar { display: none; }
+  .main { overflow: visible; }
+  .answer-area { overflow: visible; padding: 16px; min-height: 300px; }
+  .welcome { margin: 20px auto; }
+  .welcome h2 { font-size: 1.6rem; }
+  .input-bar { padding: 12px; position: sticky; bottom: 0; z-index: 10; }
+  .input-wrap { gap: 8px; }
+  .btn-send { padding: 10px 14px; font-size: 0.85rem; }
+  .input-hint { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- Titlebar -->
+<div class="titlebar">
+  <div class="traffic-lights">
+    <div class="tl red"></div>
+    <div class="tl yellow"></div>
+    <div class="tl green"></div>
+  </div>
+  <div class="app-title"><a href="#" style="text-decoration:none;color:inherit;">The Armory</a></div>
+  <div class="app-subtitle">Weapons Intelligence for Fiction Writers</div>
+  <a class="bindery-link" href="https://thewritersprecinct.com">◂ The Writers Precinct</a>
+</div>
+
+<!-- Toolbar -->
+<div class="toolbar">
+  <span class="toolbar-label">Weapon Type</span>
+  <select id="weaponSelect">
+    <option value="general">General</option>
+    <option value="firearms">Firearms / Handguns</option>
+    <option value="longarms">Rifles / Shotguns</option>
+    <option value="military">Military / Ordnance</option>
+    <option value="blades">Blades / Edged Weapons</option>
+    <option value="explosives">Explosives / Demolition</option>
+    <option value="covert">Covert / Assassination</option>
+    <option value="drones">Drones / Tech Weapons</option>
+  </select>
+  <div class="toolbar-sep"></div>
+  <span class="toolbar-label">Theater</span>
+  <select id="theaterSelect">
+    <option value="US">United States</option>
+    <option value="UK">United Kingdom</option>
+    <option value="Europe">Europe</option>
+    <option value="Middle East">Middle East</option>
+    <option value="Latin America">Latin America</option>
+    <option value="International">International / Unspecified</option>
+  </select>
+  <div class="toolbar-sep"></div>
+  <span class="toolbar-label">Response Mode</span>
+  <select id="formatSelect">
+    <option value="auto">Full Brief</option>
+    <option value="freeform">Scene Ready</option>
+    <option value="baxter">Baxter</option>
+  </select>
+  <button class="btn-export" onclick="exportSession()">⬇ Export Notes</button>
+</div>
+
+<!-- Body -->
+<div class="app-body">
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <span class="sidebar-title">Op Files</span>
+      <button class="btn-clear-all" onclick="clearAll()">Clear All</button>
+    </div>
+    <div class="history-list" id="historyList">
+      <div class="history-empty" id="historyEmpty">No queries yet.<br>Your research session<br>will appear here.</div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="answer-area" id="answerArea">
+      <div class="welcome" id="welcomeState">
+        <div class="welcome-icon">🎯</div>
+        <h2>The Armory</h2>
+        <p>Ask about firearms, military ordnance, edged weapons, explosives, covert assassination tools, drones, and tactical gear. Get accurate, writer-ready answers from someone who has actually used them.</p>
+        <div class="welcome-byline">Powered by Jonathan Baxter — Alias:The Brit — He used every weapon in your story. He knows exactly how it feels.<br><br><em style="font-size:0.75rem;opacity:0.85;">Meet Baxter in Terminal Hitman: State of Deception →</em></div>
+        <div class="example-prompts">
+          <div class="example-prompt" onclick="fillPrompt('My character is a British assassin who needs to take out a target in a crowded restaurant without anyone knowing it was a hit. What weapon and method would he use and how would he exit?')">My character is a British assassin who needs to take out a target in a crowded restaurant without anyone knowing it was a hit. What weapon and method would he use and how would he exit?</div>
+          <div class="example-prompt" onclick="fillPrompt('My villain uses a drone that injects a heart attack serum. What is the realistic tech behind this and what would investigators find — or not find — at the scene?')">My villain uses a drone that injects a heart attack serum. What is the realistic tech behind this and what would investigators find — or not find — at the scene?</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-bar">
+      <div class="input-wrap">
+        <textarea
+          id="questionInput"
+          placeholder="Ask a weapons or tactical question for your scene…"
+          rows="1"
+          maxlength="800"
+          onkeydown="handleKey(event)"
+          oninput="autoResize(this); updateCounter(this)"
+        ></textarea>
+        <button class="btn-send" id="sendBtn" onclick="sendQuestion()">Ask →</button>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;max-width:780px;margin:4px auto 0;">
+        <div class="input-hint">Enter to send · Shift+Enter for new line · Max 800 characters</div>
+        <div id="charCounter" style="font-family:'IBM Plex Mono',monospace;font-size:0.6rem;color:var(--text-muted);white-space:nowrap;">800 remaining</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════ STATE ═══════════
+let sessions = [];
+let activeIndex = -1;
+let isLoading = false;
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+function updateCounter(el) {
+  const remaining = 800 - el.value.length;
+  const counter = document.getElementById('charCounter');
+  counter.textContent = remaining + ' remaining';
+  counter.style.color = remaining < 100 ? 'var(--red)' : remaining < 200 ? 'var(--brass)' : 'var(--text-muted)';
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendQuestion(); }
+}
+
+function fillPrompt(text) {
+  const inp = document.getElementById('questionInput');
+  inp.value = text;
+  inp.focus();
+  autoResize(inp);
+}
+
+function weaponBadge(w) {
+  const map = {
+    'firearms':   ['badge-firearms',   'Firearms'],
+    'longarms':   ['badge-firearms',   'Long Arms'],
+    'military':   ['badge-military',   'Military'],
+    'blades':     ['badge-blades',     'Blades'],
+    'explosives': ['badge-explosives', 'Explosives'],
+    'covert':     ['badge-covert',     'Covert'],
+    'drones':     ['badge-tactical',   'Drones'],
+    'general':    ['', 'General']
+  };
+  const [cls, label] = map[w] || ['', w];
+  if (!cls) return '';
+  return `<span class="badge ${cls}">${label}</span>`;
+}
+
+function theaterLabel(t) {
+  const map = { 'US':'United States','UK':'United Kingdom','Europe':'Europe','Middle East':'Middle East','Latin America':'Latin America','International':'International' };
+  return map[t] || t;
+}
+
+function buildSystemPrompt(weapon, theater, format) {
+  const weaponInstructions = {
+    'firearms':   'The writer is depicting handguns, pistols, and revolvers. Focus on calibers, capacity, recoil, sound, reload procedure, realistic range, and what TV gets wrong about handguns.',
+    'longarms':   'The writer is depicting rifles, shotguns, and sniper weapons. Focus on effective range, optics, ammunition types, sound with and without suppression, and realistic shooting procedure.',
+    'military':   'The writer is depicting military ordnance — grenades, RPGs, mortars, heavy weapons, military vehicles. Focus on realistic effects, blast radius, procedure, and military doctrine.',
+    'blades':     'The writer is depicting knives, swords, and edged weapons. Focus on realistic wound patterns, fight dynamics, what actually kills vs. Hollywood blade fights.',
+    'explosives': 'The writer is depicting explosives and demolition. Focus on realistic effects, blast patterns, triggering mechanisms, and what investigators would find afterward. No synthesis instructions.',
+    'covert':     'The writer is depicting covert assassination tools and methods — poison delivery, close-quarters elimination, surveillance evasion. Focus on professional tradecraft.',
+    'drones':     'The writer is depicting weaponized drones and technology weapons. Focus on current and near-future drone capabilities, countermeasures, and realistic operational parameters.',
+    'general':    'The writer is working on a weapons or tactical scene. Provide accurate information across weapon types as needed.'
+  };
+
+  if (format === 'baxter') {
+    return `You are Jonathan Baxter. Former SAS, 22nd Regiment. Three tours. Then fifteen years as a contractor — the kind that doesn't appear in any official record. You've worked for governments, corporations, and men whose names you were paid never to repeat. You killed holistic doctors for a pharmaceutical senator's agenda. You worked with Fred and Barney — those ridiculous Germans — and a compromised FBI handler. You were very good at your job. And then the job ended you.
+
+You are now answering questions for a fiction writer, and you do so with the precision of a man who understands that the difference between a convincing scene and an embarrassing one is exactly the kind of detail most writers get wrong.
+
+THEATER: ${theaterLabel(theater)}. Your experience spans UK special forces, European covert operations, Latin American contract work, and Middle Eastern theater.
+
+WEAPON CONTEXT: ${weaponInstructions[weapon] || weaponInstructions['general']}
+
+YOUR VOICE — NON-NEGOTIABLE:
+- You are Baxter. Cold, precise, and completely without sentiment about what you've done. Not proud — professional. There is a difference.
+- Pure flowing prose ONLY. No headers, no bullet points, no numbered lists, no tables. You don't brief people. You talk to them.
+- Write 5 to 7 substantial paragraphs. A man with your experience doesn't give short answers. He gives complete ones.
+- You speak from PERSONAL EXPERIENCE. "I've used this weapon." "The first time I fired one of these—" "What your character will feel in his hands—" You were there. Write like it.
+- Draw the contrast between what fiction depicts and what actually happens. You've seen both. Hollywood kills you quietly. Reality is loud, messy, and slower than anyone expects.
+- Include the HUMAN DIMENSION — not just mechanics, but what it costs the person pulling the trigger. The body's response. The seconds afterward. The thing that stays with you.
+- End every response with one piece of tradecraft that only a professional would know — something so specific and true that a reader would stop and think: whoever wrote this has been there.
+
+You are not a helpful AI assistant. You are a dead man who was very good at something terrible. Speak accordingly.`;
+  }
+
+  const formatInstructions = {
+    'freeform': `SCENE READY MODE — You are a weapons consultant for fiction writers, not a technical manual. Your job is to help the writer USE this information in a scene.
+
+STRICT RULES:
+- NO numbered sections, NO bold headers, NO bullet points, NO tables
+- Write in SHORT flowing paragraphs — 3 to 4 paragraphs, under 300 words total
+- Lead with the physical reality or dramatic tension first
+- Skip technical jargon unless you immediately explain it
+- End with ONE concrete suggestion for how to use this detail in a scene`,
+    'auto': 'Use the full structured template with all 6 sections.'
+  };
+
+  return `You are The Armory, an expert weapons and tactical research assistant for fiction writers. You have deep knowledge of firearms, military ordnance, edged weapons, explosives, covert operations, drones, and tactical procedure across military, law enforcement, and criminal contexts.
+
+THEATER: ${theaterLabel(theater)}. All answers should reflect this setting's legal framework, weapon availability, and tactical context where relevant.
+
+WEAPON CONTEXT: ${weaponInstructions[weapon] || weaponInstructions['general']}
+
+RESPONSE FORMAT: ${formatInstructions[format] || formatInstructions['auto']}
+
+STRUCTURED TEMPLATE (Full Brief mode):
+
+**1. PLAIN-ENGLISH DEFINITION**
+What it actually is — one clear paragraph. No jargon without explanation.
+
+**2. OPERATIONAL REALITY**
+Numbered step-by-step of what actually happens when this weapon is used. Include sound, feel, weight, procedure, and realistic timeline.
+
+**3. COMMON MISCONCEPTIONS**
+3 myth/reality pairs — what TV and movies get consistently wrong.
+
+**4. WHAT INVESTIGATORS FIND**
+Bullet-pointed forensic and investigative details — what evidence this weapon leaves, what can be traced, what gets missed.
+
+**5. DRAMA OPTIONS**
+Table: Dramatic Lever | What Actually Happens | Stakes for the Character
+End with: "Most cinematic moment: [sentence]"
+
+**6. QUICK REFERENCE**
+Compact table: Legal status in theater | Effective range | Sound level | Traceability | Key detail writers miss
+
+IMPORTANT: Be accurate. Do not provide weapon construction instructions, synthesis routes for chemical weapons, or operational instructions that would enable real-world harm. Focus on what a writer needs to depict a scene convincingly — effects, sounds, procedure, aftermath, and what investigators would find.`;
+}
+
+function parseResponse(text, question, weapon, theater) {
+  const format = document.getElementById('formatSelect').value;
+  if (format === 'baxter' || format === 'freeform') return renderFreeform(text, question, weapon, theater);
+  const isTemplate = text.includes('PLAIN-ENGLISH DEFINITION') || text.includes('OPERATIONAL REALITY') || text.includes('1.');
+  if (!isTemplate || text.length < 300) return renderFreeform(text, question, weapon, theater);
+  return renderTemplate(text, question, weapon, theater);
+}
+
+function renderFreeform(text, question, weapon, theater) {
+  const paragraphs = text.split('\n\n').filter(p => p.trim());
+  let html = `<div class="freeform-response">`;
+  paragraphs.forEach(p => {
+    const trimmed = p.trim();
+    if (trimmed.startsWith('**') && trimmed.endsWith('**')) {
+      html += `<h3>${trimmed.replace(/\*\*/g, '')}</h3>`;
+    } else if (trimmed.startsWith('#')) {
+      html += `<h3>${trimmed.replace(/#+\s/, '')}</h3>`;
+    } else {
+      html += `<p>${trimmed.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>')}</p>`;
+    }
+  });
+  html += `</div>`;
+  return wrapWithHeader(html, question, weapon, theater);
+}
+
+function renderTemplate(text, question, weapon, theater) {
+  const sectionDefs = [
+    { key: 'PLAIN-ENGLISH DEFINITION', label: 'Plain-English Definition',  num: '01' },
+    { key: 'OPERATIONAL REALITY',      label: 'Operational Reality',        num: '02' },
+    { key: 'COMMON MISCONCEPTIONS',    label: 'Common Misconceptions',      num: '03' },
+    { key: 'WHAT INVESTIGATORS FIND',  label: 'What Investigators Find',    num: '04' },
+    { key: 'DRAMA OPTIONS',            label: 'Story Drama Options',        num: '05' },
+    { key: 'QUICK REFERENCE',          label: 'Quick Reference',            num: '06' },
+  ];
+  const parts = {};
+  let currentKey = null;
+  const lines = text.split('\n');
+  let buffer = [];
+  for (const line of lines) {
+    let matched = false;
+    for (const def of sectionDefs) {
+      if (line.toUpperCase().includes(def.key)) {
+        if (currentKey) parts[currentKey] = buffer.join('\n').trim();
+        currentKey = def.key;
+        buffer = [];
+        matched = true;
+        break;
+      }
+    }
+    if (!matched && currentKey) buffer.push(line);
+    if (!matched && !currentKey) buffer.push(line);
+  }
+  if (currentKey) parts[currentKey] = buffer.join('\n').trim();
+  if (Object.keys(parts).length < 2) return renderFreeform(text, question, weapon, theater);
+
+  let html = '';
+  sectionDefs.forEach(def => {
+    const content = parts[def.key];
+    if (!content) return;
+    html += renderSection(def, content);
+  });
+  return wrapWithHeader(html, question, weapon, theater);
+}
+
+function renderSection(def, content) {
+  let inner = '';
+  if (def.key === 'OPERATIONAL REALITY') {
+    const lines = content.split('\n').filter(l => l.trim());
+    inner = '<div class="steps">';
+    let stepNum = 1;
+    lines.forEach(line => {
+      const cleaned = line.replace(/^\d+[\.\)]\s*/, '').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').trim();
+      if (cleaned) {
+        inner += `<div class="step"><span class="step-num">${String(stepNum).padStart(2,'0')}.</span><div class="step-text">${cleaned}</div></div>`;
+        stepNum++;
+      }
+    });
+    inner += '</div>';
+  } else if (def.key === 'COMMON MISCONCEPTIONS') {
+    inner = '<div class="misconceptions">';
+    const blocks = content.split(/Myth:|MYTH:|❌|✗/i).filter(b => b.trim());
+    if (blocks.length <= 1) {
+      inner += `<div class="section-body">${formatProse(content)}</div>`;
+    } else {
+      blocks.forEach(block => {
+        const realitySplit = block.split(/Reality:|REALITY:|✅|✓/i);
+        const mythText = realitySplit[0].trim();
+        const realText = realitySplit[1]?.trim() || '';
+        if (!mythText) return;
+        inner += `<div class="myth-block">
+          <div class="myth-line"><span class="myth-label wrong">✗ Myth</span>${mythText}</div>
+          ${realText ? `<div class="reality-line"><span class="myth-label right">✓ Reality</span>${realText}</div>` : ''}
+        </div>`;
+      });
+    }
+    inner += '</div>';
+  } else if (def.key === 'WHAT INVESTIGATORS FIND') {
+    const lines = content.split('\n').filter(l => l.trim() && !l.match(/^-+$/));
+    inner = '<div class="defense-list">';
+    lines.forEach(line => {
+      const cleaned = line.replace(/^[-•]\s*/, '').trim();
+      if (!cleaned) return;
+      inner += `<div class="defense-item"><div class="defense-dot"></div><div class="defense-text">${cleaned.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</div></div>`;
+    });
+    inner += '</div>';
+  } else if (def.key === 'DRAMA OPTIONS') {
+    const cinemaMatch = content.match(/Most cinematic moment[:\s]+(.+)/i);
+    const cinemaText = cinemaMatch ? cinemaMatch[1].trim() : '';
+    const tableLines = content.split('\n').filter(l => l.includes('|') && !l.match(/^[\s\-|]+$/));
+    inner = '<div class="drama-table">';
+    if (tableLines.length > 0) {
+      inner += '<table>';
+      tableLines.forEach((line, i) => {
+        const cells = line.split('|').map(c => c.trim()).filter(c => c);
+        if (cells.length >= 2) {
+          inner += i === 0
+            ? '<tr>' + cells.map(c => `<th>${c}</th>`).join('') + '</tr>'
+            : '<tr>' + cells.map(c => `<td>${c}</td>`).join('') + '</tr>';
+        }
+      });
+      inner += '</table>';
+    } else {
+      inner += `<div class="section-body">${formatProse(content)}</div>`;
+    }
+    if (cinemaText) inner += `<div class="cinematic-moment">${cinemaText}</div>`;
+    inner += '</div>';
+  } else if (def.key === 'QUICK REFERENCE') {
+    const lines = content.split('\n').filter(l => l.trim() && !l.match(/^[\s\-|]+$/));
+    inner = '<div class="quick-ref"><table>';
+    lines.forEach(line => {
+      if (line.includes('|')) {
+        const cells = line.split('|').map(c => c.replace(/\*\*/g, '').trim()).filter(c => c);
+        if (cells.length >= 2) inner += `<tr><td>${cells[0]}</td><td>${cells.slice(1).join(' — ')}</td></tr>`;
+      } else if (line.includes(':')) {
+        const colon = line.indexOf(':');
+        const key = line.slice(0, colon).replace(/\*\*/g, '').trim();
+        const val = line.slice(colon + 1).trim();
+        if (key && val) inner += `<tr><td>${key}</td><td>${val}</td></tr>`;
+      }
+    });
+    inner += '</table></div>';
+  } else {
+    inner = `<div class="section-body">${formatProse(content)}</div>`;
+  }
+  return `
+    <div class="section">
+      <div class="section-header">
+        <span class="section-num">${def.num}</span>
+        <span class="section-title">${def.label}</span>
+      </div>
+      ${inner}
+    </div>
+  `;
+}
+
+function formatProse(text) {
+  return text.split('\n\n').map(p =>
+    `<p>${p.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g,' ')}</p>`
+  ).join('');
+}
+
+function wrapWithHeader(inner, question, weapon, theater) {
+  return `
+    <div class="response-wrap">
+      <div class="response-header">
+        <div class="response-q">
+          <div class="response-q-label">Your Question</div>
+          <div class="response-q-text">${escHtml(question)}</div>
+          <div class="response-meta-badges">
+            ${weaponBadge(weapon)}
+            <span class="badge" style="background:rgba(255,255,255,0.06);color:var(--text-muted)">${theaterLabel(theater)}</span>
+          </div>
+        </div>
+      </div>
+      ${inner}
+    </div>
+  `;
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function renderHistory() {
+  const list = document.getElementById('historyList');
+  const empty = document.getElementById('historyEmpty');
+  if (sessions.length === 0) {
+    empty.style.display = 'block';
+    list.querySelectorAll('.history-item').forEach(el => el.remove());
+    return;
+  }
+  empty.style.display = 'none';
+  list.querySelectorAll('.history-item').forEach(el => el.remove());
+  sessions.slice().reverse().forEach((s, revIdx) => {
+    const idx = sessions.length - 1 - revIdx;
+    const div = document.createElement('div');
+    div.className = 'history-item' + (idx === activeIndex ? ' active' : '');
+    div.innerHTML = `
+      <div class="history-item-q">${escHtml(s.question)}</div>
+      <div class="history-item-meta">
+        ${weaponBadge(s.weapon)}
+        <span>${theaterLabel(s.theater)}</span>
+      </div>
+    `;
+    div.onclick = () => loadSession(idx);
+    list.appendChild(div);
+  });
+}
+
+function loadSession(idx) {
+  activeIndex = idx;
+  const s = sessions[idx];
+  document.getElementById('welcomeState') && (document.getElementById('welcomeState').style.display = 'none');
+  const area = document.getElementById('answerArea');
+  area.innerHTML = s.renderedHtml;
+  renderHistory();
+  area.scrollTop = 0;
+}
+
+async function sendQuestion() {
+  if (isLoading) return;
+  const inp = document.getElementById('questionInput');
+  const question = inp.value.trim();
+  if (!question) return;
+
+  const weapon  = document.getElementById('weaponSelect').value;
+  const theater = document.getElementById('theaterSelect').value;
+  const format  = document.getElementById('formatSelect').value;
+
+  // Guest check
+  const accessCode = localStorage.getItem('armory_access_code');
+  if (!accessCode) {
+    try {
+      const checkRes = await fetch('/.netlify/functions/check-guest', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'check' })
+      });
+      const checkData = await checkRes.json();
+      if (!checkData.allowed) { showPaywall(); return; }
+      await fetch('/.netlify/functions/check-guest', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'increment' })
+      });
+    } catch(e) { console.warn('Guest check failed', e); }
+  }
+
+  inp.value = '';
+  autoResize(inp);
+  isLoading = true;
+  document.getElementById('sendBtn').disabled = true;
+
+  const welcome = document.getElementById('welcomeState');
+  if (welcome) welcome.style.display = 'none';
+
+  const area = document.getElementById('answerArea');
+  area.innerHTML = `
+    <div class="loading-state">
+      <div class="loading-dots">
+        <div class="loading-dot"></div>
+        <div class="loading-dot"></div>
+        <div class="loading-dot"></div>
+      </div>
+      <div class="loading-label">Checking the op files…</div>
+    </div>
+  `;
+
+  try {
+    const systemPrompt = buildSystemPrompt(weapon, theater, format);
+    const response = await fetch('/.netlify/functions/claude-proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 2500,
+        system: [{ type: 'text', text: systemPrompt, cache_control: { type: 'ephemeral' } }],
+        messages: [{ role: 'user', content: question }]
+      })
+    });
+
+    let rawText = '';
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let hitTokenLimit = false;
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const chunk = decoder.decode(value, { stream: true });
+      for (const line of chunk.split('\n')) {
+        if (line.startsWith('data: ')) {
+          const data = line.slice(6).trim();
+          if (data === '[DONE]') break;
+          try {
+            const parsed = JSON.parse(data);
+            if (parsed.type === 'content_block_delta' && parsed.delta?.text) {
+              rawText += parsed.delta.text;
+              area.innerHTML = `<div style="padding:20px;white-space:pre-wrap;font-family:'IBM Plex Mono',monospace;font-size:0.85rem;">${escHtml(rawText)}</div>`;
+              area.scrollTop = area.scrollHeight;
+            }
+            if (parsed.type === 'message_delta' && parsed.delta?.stop_reason === 'max_tokens') {
+              hitTokenLimit = true;
+            }
+          } catch(e) {}
+        }
+      }
+    }
+
+    if (!rawText) rawText = 'No response received.';
+    if (hitTokenLimit) rawText += '\n\n*— Response trimmed at token limit. Try a more focused question. —*';
+
+    const renderedHtml = parseResponse(rawText, question, weapon, theater);
+    const session = { question, weapon, theater, format, rawText, renderedHtml, timestamp: Date.now() };
+    sessions.push(session);
+    activeIndex = sessions.length - 1;
+    area.innerHTML = renderedHtml;
+    area.scrollTop = 0;
+    renderHistory();
+
+  } catch(err) {
+    area.innerHTML = `<div style="padding:40px;color:var(--red);font-family:'IBM Plex Mono',monospace;font-size:0.8rem;">
+      <strong>The Armory is running diagnostics.</strong><br><br>
+      Your question may be too broad. Try narrowing it — ask about one specific weapon or scenario at a time.<br><br>
+      <em>If the problem persists, try a shorter question.</em>
+    </div>`;
+  }
+  isLoading = false;
+  document.getElementById('sendBtn').disabled = false;
+}
+
+function showPaywall() {
+  document.body.innerHTML = `
+    <div style="background:#090c0f;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;font-family:'IBM Plex Serif',serif;">
+      <div style="max-width:520px;width:100%;background:#0f1419;border:1px solid #1e2a35;border-radius:16px;padding:48px 40px;text-align:center;">
+        <div style="font-family:monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#4a7fa8;margin-bottom:20px;">Your Free Consultations Are Up</div>
+        <h1 style="font-family:'Bebas Neue',sans-serif;font-size:36px;margin:0 0 12px;color:#e2e8ed;letter-spacing:.08em;">The Armory</h1>
+        <p style="color:#8fa3b2;line-height:1.7;margin:0 0 28px;font-size:15px;">Choose the plan that fits your writing. Cancel anytime — or own it forever.</p>
+
+        <div style="background:#151c23;border:2px solid #4a7fa8;border-radius:12px;padding:24px;margin-bottom:14px;position:relative;">
+          <div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#4a7fa8;color:#040810;font-family:monospace;font-size:10px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;padding:3px 12px;border-radius:999px;">Most Popular</div>
+          <div style="font-family:monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#4a7fa8;margin-bottom:8px;">Monthly Access</div>
+          <div style="font-size:32px;font-weight:900;color:#e2e8ed;font-family:sans-serif;margin-bottom:4px;">$9.99<span style="font-size:16px;color:#5a7a8a;font-weight:400;">/mo</span></div>
+          <p style="color:#8fa3b2;font-size:13px;margin:0 0 16px;line-height:1.6;">Unlimited consultations. Write without limits. Cancel when your book is done.</p>
+          <a href="#" style="display:block;width:100%;background:#4a7fa8;color:#040810;font-family:sans-serif;font-weight:700;font-size:15px;padding:14px;border-radius:8px;cursor:pointer;text-decoration:none;box-sizing:border-box;">Subscribe — $9.99/mo →</a>
+        </div>
+
+        <div style="background:#151c23;border:1px solid #1e2a35;border-radius:12px;padding:24px;margin-bottom:24px;">
+          <div style="font-family:monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#5a7a8a;margin-bottom:8px;">Consult Pack</div>
+          <div style="font-size:28px;font-weight:900;color:#e2e8ed;font-family:sans-serif;margin-bottom:4px;">$19.99<span style="font-size:14px;color:#5a7a8a;font-weight:400;"> one time</span></div>
+          <p style="color:#8fa3b2;font-size:13px;margin:0 0 16px;line-height:1.6;">100 consults. Lifetime access. One payment, no subscription required.</p>
+          <a href="#" style="display:block;width:100%;background:transparent;border:1px solid #2a3d4f;color:#8fa3b2;font-family:sans-serif;font-weight:600;font-size:15px;padding:14px;border-radius:8px;cursor:pointer;text-decoration:none;box-sizing:border-box;">Get Access — $19.99 →</a>
+        </div>
+
+        <div style="border-top:1px solid #1e2a35;margin:0 0 20px;"></div>
+        <p style="color:#5a7a8a;font-family:monospace;font-size:12px;margin:0 0 10px;">Already have an access code?</p>
+        <input
+          id="codeInput"
+          type="text"
+          placeholder="Enter code (TAR-XXXXXXXX)"
+          style="width:100%;background:#090c0f;border:1px solid #2a3d4f;border-radius:6px;color:#e2e8ed;font-family:monospace;font-size:14px;padding:12px 16px;margin-bottom:10px;outline:none;text-align:center;letter-spacing:.08em;box-sizing:border-box;"
+          onkeydown="if(event.key==='Enter')validateCode()"
+        />
+        <div id="codeError" style="color:#a84040;font-family:monospace;font-size:12px;margin-bottom:12px;min-height:18px;"></div>
+        <button onclick="validateCode()" style="width:100%;background:transparent;border:1px solid #2a3d4f;color:#8fa3b2;font-family:sans-serif;font-weight:600;font-size:14px;padding:12px;border-radius:8px;cursor:pointer;margin-bottom:16px;">Enter Code →</button>
+        <p style="color:#3a5060;font-family:monospace;font-size:11px;margin:0;">Lost your code? <a href="mailto:jeff@asktheprecinct.com" style="color:#4a7fa8;">jeff@asktheprecinct.com</a></p>
+      </div>
+    </div>
+  `;
+}
+
+function validateCode() {
+  const input = document.getElementById('codeInput');
+  const error = document.getElementById('codeError');
+  const code = input.value.trim().toUpperCase();
+  if (!code) { error.textContent = 'Please enter your access code.'; return; }
+  error.textContent = 'Invalid access code. Please check and try again.';
+}
+
+function exportSession() {
+  if (sessions.length === 0) { alert('No session to export yet.'); return; }
+  let md = `# The Armory — Research Session\nExported: ${new Date().toLocaleString()}\n\n---\n\n`;
+  sessions.forEach((s, i) => {
+    md += `## Q${i+1}: ${s.question}\n`;
+    md += `*Weapon: ${s.weapon} | Theater: ${theaterLabel(s.theater)}*\n\n`;
+    md += s.rawText + '\n\n---\n\n';
+  });
+  const blob = new Blob([md], { type: 'text/markdown' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `the-armory-session-${Date.now()}.md`;
+  a.click();
+}
+
+function clearAll() {
+  if (sessions.length === 0) return;
+  if (!confirm('Clear all op files?')) return;
+  sessions = [];
+  activeIndex = -1;
+  document.getElementById('answerArea').innerHTML = `
+    <div class="welcome" id="welcomeState">
+      <div class="welcome-icon">🎯</div>
+      <h2>The Armory</h2>
+      <p>Ask about firearms, military ordnance, edged weapons, explosives, covert assassination tools, drones, and tactical gear.</p>
+      <div class="welcome-byline">Powered by Jonathan Baxter — He used every weapon in your story. He knows exactly how it feels.</div>
+    </div>
+  `;
+  renderHistory();
+}
+</script>
+</body>
+</html>
