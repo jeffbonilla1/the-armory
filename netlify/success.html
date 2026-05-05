@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Precinct — Access Granted</title>
+<style>
+  body {
+    background: #0e0e0f;
+    color: #e8e6e0;
+    font-family: 'Georgia', serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+  }
+  .card {
+    max-width: 520px;
+    width: 100%;
+    background: #161618;
+    border: 1px solid #2a2a2e;
+    border-radius: 16px;
+    padding: 48px 40px;
+    text-align: center;
+  }
+  .badge {
+    font-family: monospace;
+    font-size: 11px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: #c8782a;
+    margin-bottom: 20px;
+  }
+  h1 {
+    font-size: 28px;
+    margin: 0 0 12px;
+    font-family: sans-serif;
+  }
+  p {
+    color: #a7a39a;
+    line-height: 1.7;
+    margin: 0 0 32px;
+    font-size: 15px;
+  }
+  .code-box {
+    background: #0e0e0f;
+    border: 1px solid #c8782a;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 0 0 12px;
+  }
+  .code-label {
+    font-family: monospace;
+    font-size: 11px;
+    color: #7d7a73;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .code {
+    font-family: monospace;
+    font-size: 22px;
+    color: #c8782a;
+    letter-spacing: .15em;
+    word-break: break-all;
+  }
+  .copy-btn {
+    background: transparent;
+    border: 1px solid #2a2a2e;
+    color: #a7a39a;
+    font-family: monospace;
+    font-size: 12px;
+    padding: 8px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-bottom: 32px;
+    transition: all .2s;
+  }
+  .copy-btn:hover { border-color: #c8782a; color: #c8782a; }
+  .enter-btn {
+    display: block;
+    background: #c8782a;
+    color: #120b05;
+    text-decoration: none;
+    font-family: sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    padding: 14px 28px;
+    border-radius: 8px;
+    cursor: pointer;
+    border: none;
+    width: 100%;
+    transition: background .2s;
+  }
+  .enter-btn:hover { background: #d48030; }
+  .note {
+    margin-top: 20px;
+    font-size: 12px;
+    color: #7d7a73;
+    font-family: monospace;
+  }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="badge">⚡ Payment Confirmed</div>
+  <h1>Access Granted.</h1>
+  <p>Save your access code below — you'll need it if you ever clear your browser or switch devices. Keep it somewhere safe.</p>
+  <div class="code-box">
+    <div class="code-label">Your Access Code</div>
+    <div class="code" id="accessCode">Loading...</div>
+  </div>
+  <button class="copy-btn" onclick="copyCode()">Copy Code</button>
+  <button class="enter-btn" onclick="enterPrecinct()">Enter The Precinct →</button>
+  <div class="note">A copy of this code has been sent to your email.</div>
+</div>
+
+<script>
+  let currentCode = '';
+
+  async function loadCode() {
+    const params = new URLSearchParams(window.location.search);
+    const sessionId = params.get('session_id');
+    if (!sessionId) {
+      document.getElementById('accessCode').textContent = 'Invalid session.';
+      return;
+    }
+    try {
+      const res = await fetch(`/.netlify/functions/get-access-code?session_id=${sessionId}`);
+      const data = await res.json();
+      currentCode = data.code || '';
+      document.getElementById('accessCode').textContent = currentCode || 'Error loading code.';
+    } catch(e) {
+      document.getElementById('accessCode').textContent = 'Error loading code.';
+    }
+  }
+
+  function copyCode() {
+    if (!currentCode) return;
+    navigator.clipboard.writeText(currentCode).then(() => {
+      const btn = document.querySelector('.copy-btn');
+      btn.textContent = 'Copied ✓';
+      setTimeout(() => btn.textContent = 'Copy Code', 2000);
+    });
+  }
+
+  function enterPrecinct() {
+    if (currentCode) {
+      // Save code to localStorage so user goes straight in
+      localStorage.setItem('precinct_access_code', currentCode);
+    }
+    window.location.href = 'https://app.asktheprecinct.com';
+  }
+
+  loadCode();
+</script>
+</body>
+</html>
