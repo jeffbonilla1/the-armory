@@ -286,6 +286,8 @@ select:focus { border-color: var(--accent); }
   margin-bottom: 28px;
   font-style: italic;
 }
+.welcome-byline a { color: #4a7fa8 !important; }
+.welcome-byline a:visited { color: #4a7fa8 !important; }
 .example-prompts { display: flex; flex-direction: column; gap: 10px; text-align: left; }
 .example-prompt {
   background: var(--surface);
@@ -522,7 +524,7 @@ textarea::placeholder { color: var(--text-muted); font-style: italic; }
         <div class="welcome-icon">🎯</div>
         <h2>The Armory</h2>
         <p>Ask about firearms, military ordnance, edged weapons, explosives, covert assassination tools, drones, and tactical gear. Get accurate, writer-ready answers from someone who has actually used them.</p>
-       <div class="welcome-byline">Powered by The Brit — He used every weapon in your story. He knows exactly how it feels.<br><br><em style="font-size:0.75rem;opacity:0.85;"><a href="https://www.amazon.com/dp/B0FMY9Q8LX" target="_blank" style="color:#4a7fa8;">Meet The Brit in Terminal Hitman: State of Deception →</a></em></div>
+       <div class="welcome-byline">Powered by The Brit — He used every weapon in your story. He knows exactly how it feels.<br><br><em style="font-size:0.75rem;opacity:0.85;"><a href="https://www.amazon.com/dp/B0FMY9Q8LX" target="_blank" style="color:#4a7fa8 !important; text-decoration:none;">Meet The Brit in Terminal Hitman: State of Deception →</a></em></div>
         <div class="example-prompts">
           <div class="example-prompt" onclick="fillPrompt('Do you recall your first assignment in which you had to use a suppressor, and can it be used covertly in a public situation like at an outdoor market?')">Do you recall your first assignment in which you had to use a suppressor, and can it be used covertly in a public situation like at an outdoor market?</div>
           <div class="example-prompt" onclick="fillPrompt('My villain uses a drone that injects a heart attack serum. What is the realistic tech behind this and what would investigators find — or not find — at the scene?')">My villain uses a drone that injects a heart attack serum. What is the realistic tech behind this and what would investigators find — or not find — at the scene?</div>
@@ -1081,7 +1083,7 @@ function clearAll() {
       <div class="welcome-icon">🎯</div>
       <h2>The Armory</h2>
       <p>Ask about firearms, military ordnance, edged weapons, explosives, covert assassination tools, drones, and tactical gear.</p>
-      <div class="welcome-byline">Powered by Jonathan Baxter — He used every weapon in your story. He knows exactly how it feels.</div>
+      <div class="welcome-byline">Powered by The Brit — He used every weapon in your story. He knows exactly how it feels.<br><br><em style="font-size:0.75rem;opacity:0.85;"><a href="https://www.amazon.com/dp/B0FMY9Q8LX" target="_blank" style="color:#4a7fa8 !important; text-decoration:none;">Meet The Brit in Terminal Hitman: State of Deception →</a></em></div>
     </div>
   `;
   renderHistory();
