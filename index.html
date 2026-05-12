@@ -1050,12 +1050,29 @@ function showPaywall() {
   `;
 }
 
-function validateCode() {
+async function validateCode() {
   const input = document.getElementById('codeInput');
   const error = document.getElementById('codeError');
   const code = input.value.trim().toUpperCase();
-  if (!code) { error.textContent = 'Please enter your access code.'; return; }
-  error.textContent = 'Invalid access code. Please check and try again.';
+
+  if (!code) {
+    error.textContent = 'Please enter your access code.';
+    return;
+  }
+
+  try {
+    const res = await fetch(`/.netlify/functions/validate-code?code=${encodeURIComponent(code)}`);
+    const data = await res.json();
+
+    if (data.valid) {
+      localStorage.setItem('armory_access_code', code);
+      location.reload();
+    } else {
+      error.textContent = 'Invalid access code. Please check and try again.';
+    }
+  } catch(e) {
+    error.textContent = 'Connection error. Please try again.';
+  }
 }
 
 function exportSession() {
