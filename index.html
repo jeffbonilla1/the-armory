@@ -1089,5 +1089,27 @@ function clearAll() {
   renderHistory();
 }
 </script>
+
+<!-- FOOTER -->
+<footer style="
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 12px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  gap: 8px;
+">
+  <span style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--text-muted); letter-spacing:0.5px;">
+    © 2026 Jeff Bonilla · The Writers Precinct
+  </span>
+  <div style="display:flex; gap:24px; align-items:center;">
+    <a href="mailto:jeff@actionauthors.com" style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--text-dim); text-decoration:none; letter-spacing:0.5px; transition:color 0.2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-dim)'">Contact Us</a>
+    <a href="https://billing.stripe.com/p/login/3cI6oH2Mn6fy4EbcBidAk00" target="_blank" style="font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--text-dim); text-decoration:none; letter-spacing:0.5px; transition:color 0.2s;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text-dim)'">Manage / Cancel Subscription</a>
+  </div>
+</footer>
+
 </body>
 </html>
