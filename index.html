@@ -1083,11 +1083,18 @@ function exportSession() {
     md += `*Weapon: ${s.weapon} | Theater: ${theaterLabel(s.theater)}*\n\n`;
     md += s.rawText + '\n\n---\n\n';
   });
-  const blob = new Blob([md], { type: 'text/markdown' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `the-armory-session-${Date.now()}.md`;
-  a.click();
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  if (isMobile) {
+    const win = window.open('', '_blank');
+    win.document.write('<html><head><title>The Armory — Session Export</title><meta name="viewport" content="width=device-width,initial-scale=1"></head><body><pre style="font-family:monospace;font-size:13px;padding:20px;white-space:pre-wrap;word-wrap:break-word;">' + md.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</pre></body></html>');
+    win.document.close();
+  } else {
+    const blob = new Blob([md], { type: 'text/markdown' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `the-armory-session-${Date.now()}.md`;
+    a.click();
+  }
 }
 
 function clearAll() {
