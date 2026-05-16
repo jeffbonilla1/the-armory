@@ -54,7 +54,7 @@ exports.handler = async (event) => {
             <div style="background:#141820;border:1px solid #1a2535;border-radius:8px;padding:20px;margin:0 0 24px;">
               <div style="font-family:monospace;font-size:11px;color:#6a8499;letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px;">Your Weapons &amp; Thriller Toolkit</div>
               <p style="color:#6a8499;font-size:13px;font-family:sans-serif;margin:0 0 12px;line-height:1.6;">Your subscription includes the Weapons &amp; Thriller Toolkit PDF — eight sections on firearms, combat reality, covert operations, and writing violence with purpose. Reviewed by The Brit himself.</p>
-              <a href="https://thewritersprecinct.com/toolkits/WeaponsThrillerToolkit.pdf" style="display:block;background:#1a2535;color:#4a7fa5;text-decoration:none;font-family:monospace;font-size:13px;padding:12px;border-radius:6px;text-align:center;border:1px solid #4a7fa5;">Download Weapons &amp; Thriller Toolkit →</a>
+              <a href="https://thewritersprecinct.com/WeaponsThrillerToolkit.pdf" style="display:block;background:#1a2535;color:#4a7fa5;text-decoration:none;font-family:monospace;font-size:13px;padding:12px;border-radius:6px;text-align:center;border:1px solid #4a7fa5;">Download Weapons &amp; Thriller Toolkit →</a>
             </div>
             <a href="https://askthearmory.com" style="display:block;background:#4a7fa5;color:#0d0f12;text-decoration:none;font-family:sans-serif;font-weight:700;font-size:15px;padding:14px;border-radius:8px;text-align:center;">Enter The Armory →</a>
             <p style="color:#6a8499;font-size:11px;font-family:monospace;margin:28px 0 0;text-align:center;">Questions? Email jeff@asktheprecinct.com</p>
