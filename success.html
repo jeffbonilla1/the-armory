@@ -3,117 +3,42 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Precinct — Access Granted</title>
+<title>The Armory — Access Granted</title>
 <style>
-  body {
-    background: #0e0e0f;
-    color: #e8e6e0;
-    font-family: 'Georgia', serif;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    margin: 0;
-    padding: 20px;
-  }
-  .card {
-    max-width: 520px;
-    width: 100%;
-    background: #161618;
-    border: 1px solid #2a2a2e;
-    border-radius: 16px;
-    padding: 48px 40px;
-    text-align: center;
-  }
-  .badge {
-    font-family: monospace;
-    font-size: 11px;
-    letter-spacing: .12em;
-    text-transform: uppercase;
-    color: #c8782a;
-    margin-bottom: 20px;
-  }
-  h1 {
-    font-size: 28px;
-    margin: 0 0 12px;
-    font-family: sans-serif;
-  }
-  p {
-    color: #a7a39a;
-    line-height: 1.7;
-    margin: 0 0 32px;
-    font-size: 15px;
-  }
-  .code-box {
-    background: #0e0e0f;
-    border: 1px solid #c8782a;
-    border-radius: 8px;
-    padding: 20px;
-    margin: 0 0 12px;
-  }
-  .code-label {
-    font-family: monospace;
-    font-size: 11px;
-    color: #7d7a73;
-    letter-spacing: .1em;
-    text-transform: uppercase;
-    margin-bottom: 10px;
-  }
-  .code {
-    font-family: monospace;
-    font-size: 22px;
-    color: #c8782a;
-    letter-spacing: .15em;
-    word-break: break-all;
-  }
-  .copy-btn {
-    background: transparent;
-    border: 1px solid #2a2a2e;
-    color: #a7a39a;
-    font-family: monospace;
-    font-size: 12px;
-    padding: 8px 20px;
-    border-radius: 6px;
-    cursor: pointer;
-    margin-bottom: 32px;
-    transition: all .2s;
-  }
-  .copy-btn:hover { border-color: #c8782a; color: #c8782a; }
-  .enter-btn {
-    display: block;
-    background: #c8782a;
-    color: #120b05;
-    text-decoration: none;
-    font-family: sans-serif;
-    font-weight: 700;
-    font-size: 15px;
-    padding: 14px 28px;
-    border-radius: 8px;
-    cursor: pointer;
-    border: none;
-    width: 100%;
-    transition: background .2s;
-  }
-  .enter-btn:hover { background: #d48030; }
-  .note {
-    margin-top: 20px;
-    font-size: 12px;
-    color: #7d7a73;
-    font-family: monospace;
-  }
+  body { background:#0d0f12; color:#e2e8f0; font-family:'Georgia',serif; display:flex; align-items:center; justify-content:center; min-height:100vh; margin:0; padding:20px; }
+  .card { max-width:520px; width:100%; background:#141820; border:1px solid #1a2535; border-radius:16px; padding:48px 40px; text-align:center; }
+  .badge { font-family:monospace; font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:#4a7fa5; margin-bottom:20px; }
+  h1 { font-size:28px; margin:0 0 12px; font-family:sans-serif; }
+  p { color:#6a8499; line-height:1.7; margin:0 0 32px; font-size:15px; }
+  .code-box { background:#0d0f12; border:1px solid #4a7fa5; border-radius:8px; padding:20px; margin:0 0 12px; }
+  .code-label { font-family:monospace; font-size:11px; color:#6a8499; letter-spacing:.1em; text-transform:uppercase; margin-bottom:10px; }
+  .code { font-family:monospace; font-size:22px; color:#4a7fa5; letter-spacing:.15em; word-break:break-all; }
+  .copy-btn { background:transparent; border:1px solid #1a2535; color:#6a8499; font-family:monospace; font-size:12px; padding:8px 20px; border-radius:6px; cursor:pointer; margin-bottom:20px; transition:all .2s; }
+  .copy-btn:hover { border-color:#4a7fa5; color:#4a7fa5; }
+  .toolkit-box { background:#0d0f12; border:1px solid #1a2535; border-radius:8px; padding:16px; margin:0 0 20px; text-align:left; }
+  .toolkit-label { font-family:monospace; font-size:11px; color:#6a8499; letter-spacing:.1em; text-transform:uppercase; margin-bottom:8px; }
+  .toolkit-link { display:block; background:#141820; color:#4a7fa5; text-decoration:none; font-family:monospace; font-size:12px; padding:10px 14px; border-radius:6px; border:1px solid #1a2535; text-align:center; transition:all .2s; }
+  .toolkit-link:hover { border-color:#4a7fa5; }
+  .enter-btn { display:block; background:#4a7fa5; color:#0d0f12; text-decoration:none; font-family:sans-serif; font-weight:700; font-size:15px; padding:14px 28px; border-radius:8px; cursor:pointer; border:none; width:100%; transition:background .2s; box-sizing:border-box; }
+  .enter-btn:hover { background:#5a8fb5; }
+  .note { margin-top:20px; font-size:12px; color:#6a8499; font-family:monospace; }
 </style>
 </head>
 <body>
 <div class="card">
   <div class="badge">⚡ Payment Confirmed</div>
   <h1>Access Granted.</h1>
-  <p>Save your access code below — you'll need it if you ever clear your browser or switch devices. Keep it somewhere safe.</p>
+  <p>Save your access code below — you'll need it if you ever clear your browser or switch devices.</p>
   <div class="code-box">
     <div class="code-label">Your Access Code</div>
     <div class="code" id="accessCode">Loading...</div>
   </div>
   <button class="copy-btn" onclick="copyCode()">Copy Code</button>
-  <button class="enter-btn" onclick="enterPrecinct()">Enter The Precinct →</button>
+  <div class="toolkit-box">
+    <div class="toolkit-label">Your Weapons &amp; Thriller Toolkit</div>
+    <a class="toolkit-link" href="https://thewritersprecinct.com/toolkits/WeaponsThrillerToolkit.pdf" target="_blank">Download Weapons &amp; Thriller Toolkit →</a>
+  </div>
+  <button class="enter-btn" onclick="enterArmory()">Enter The Armory →</button>
   <div class="note">A copy of this code has been sent to your email.</div>
 </div>
 
@@ -123,10 +48,7 @@
   async function loadCode() {
     const params = new URLSearchParams(window.location.search);
     const sessionId = params.get('session_id');
-    if (!sessionId) {
-      document.getElementById('accessCode').textContent = 'Invalid session.';
-      return;
-    }
+    if (!sessionId) { document.getElementById('accessCode').textContent = 'Invalid session.'; return; }
     try {
       const res = await fetch(`/.netlify/functions/get-access-code?session_id=${sessionId}`);
       const data = await res.json();
@@ -146,12 +68,9 @@
     });
   }
 
-  function enterPrecinct() {
-    if (currentCode) {
-      // Save code to localStorage so user goes straight in
-      localStorage.setItem('precinct_access_code', currentCode);
-    }
-    window.location.href = 'https://app.asktheprecinct.com';
+  function enterArmory() {
+    if (currentCode) localStorage.setItem('armory_access_code', currentCode);
+    window.location.href = 'https://askthearmory.com';
   }
 
   loadCode();
