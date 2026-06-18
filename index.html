@@ -12,11 +12,12 @@ Unauthorized copying, distribution, modification, or use prohibited.
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=AW-18085846918"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-6BF2F3Y8YZ"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
+  gtag('config', 'G-6BF2F3Y8YZ');
   gtag('config', 'AW-18085846918');
 </script>
 
@@ -1008,6 +1009,15 @@ async function sendQuestion() {
     area.innerHTML = renderedHtml;
     area.scrollTop = 0;
     renderHistory();
+
+    // GA4 tracking
+    if (typeof gtag !== 'undefined') {
+      gtag('event', 'question_submitted', {
+        tool: 'the_armory',
+        format: format,
+        user_type: window._guestMode ? 'guest' : 'paid'
+      });
+    }
 
   } catch(err) {
     area.innerHTML = `<div style="padding:40px;color:var(--red);font-family:'IBM Plex Mono',monospace;font-size:0.8rem;">
