@@ -168,6 +168,110 @@ select:focus { border-color: var(--accent); }
 }
 .btn-export:hover { border-color: var(--accent); color: var(--accent); }
 
+/* ═══════════ EXPORT MODAL ═══════════ */
+.export-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(5,7,9,0.82);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.export-modal-overlay.open { display: flex; }
+.export-modal {
+  background: var(--surface);
+  border: 1px solid var(--border-bright);
+  border-radius: 6px;
+  width: 100%;
+  max-width: 640px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.export-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+}
+.export-modal-title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+.export-modal-close {
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  font-size: 1.1rem;
+  cursor: pointer;
+  line-height: 1;
+  padding: 4px 8px;
+}
+.export-modal-close:hover { color: var(--accent); }
+.export-modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 18px;
+}
+.export-modal-body textarea {
+  width: 100%;
+  height: 100%;
+  min-height: 300px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  padding: 12px;
+  resize: vertical;
+}
+.export-modal-footer {
+  display: flex;
+  gap: 10px;
+  padding: 14px 18px;
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.export-modal-footer button {
+  background: transparent;
+  border: 1px solid var(--border-bright);
+  color: var(--text-dim);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 8px 14px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.export-modal-footer button:hover { border-color: var(--accent); color: var(--accent); }
+.export-modal-footer .btn-copy-primary {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.export-modal-hint {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  margin-right: auto;
+  align-self: center;
+}
+@media (max-width: 768px) {
+  .export-modal { max-height: 90vh; }
+  .export-modal-footer { gap: 8px; }
+  .export-modal-footer button { font-size: 0.62rem; padding: 8px 10px; }
+  .export-modal-hint { display: none; }
+}
+
 /* ═══════════ MAIN LAYOUT ═══════════ */
 .app-body { display: flex; flex: 1; overflow: hidden; }
 
@@ -1095,6 +1199,8 @@ async function validateCode() {
   }
 }
 
+let _exportMd = '';
+
 function exportSession() {
   if (sessions.length === 0) { alert('No session to export yet.'); return; }
   let md = `# The Armory — Research Session\nExported: ${new Date().toLocaleString()}\n\n---\n\n`;
@@ -1103,17 +1209,54 @@ function exportSession() {
     md += `*Weapon: ${s.weapon} | Theater: ${theaterLabel(s.theater)}*\n\n`;
     md += s.rawText + '\n\n---\n\n';
   });
-  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-  if (isMobile) {
-    const win = window.open('', '_blank');
-    win.document.write('<html><head><title>The Armory — Session Export</title><meta name="viewport" content="width=device-width,initial-scale=1"></head><body><pre style="font-family:monospace;font-size:13px;padding:20px;white-space:pre-wrap;word-wrap:break-word;">' + md.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</pre></body></html>');
-    win.document.close();
+  _exportMd = md;
+  const textarea = document.getElementById('exportModalText');
+  textarea.value = md;
+  document.getElementById('exportModalOverlay').classList.add('open');
+  const copyBtn = document.getElementById('copyExportBtn');
+  copyBtn.textContent = 'Copy to Clipboard';
+}
+
+function closeExportModal() {
+  document.getElementById('exportModalOverlay').classList.remove('open');
+}
+
+function copyExportText() {
+  const copyBtn = document.getElementById('copyExportBtn');
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(_exportMd).then(() => {
+      copyBtn.textContent = 'Copied ✓';
+      setTimeout(() => { copyBtn.textContent = 'Copy to Clipboard'; }, 2000);
+    }).catch(() => {
+      fallbackCopy(copyBtn);
+    });
   } else {
-    const blob = new Blob([md], { type: 'text/markdown' });
+    fallbackCopy(copyBtn);
+  }
+}
+
+function fallbackCopy(copyBtn) {
+  const textarea = document.getElementById('exportModalText');
+  textarea.focus();
+  textarea.select();
+  try {
+    document.execCommand('copy');
+    copyBtn.textContent = 'Copied ✓';
+  } catch (e) {
+    copyBtn.textContent = 'Select text above to copy';
+  }
+  setTimeout(() => { copyBtn.textContent = 'Copy to Clipboard'; }, 2000);
+}
+
+function downloadExportText() {
+  try {
+    const blob = new Blob([_exportMd], { type: 'text/markdown' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = `the-armory-session-${Date.now()}.md`;
     a.click();
+  } catch (e) {
+    alert('Download not supported in this browser — use Copy to Clipboard instead.');
   }
 }
 
@@ -1155,6 +1298,25 @@ function clearAll() {
     <a href="https://thewritersprecinct.com" target="_blank" style="font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:600; letter-spacing:0.5px; text-decoration:none; background:var(--accent); color:#fff; padding:6px 14px; border-radius:6px; transition:opacity 0.2s;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">Explore the Full Suite →</a>
   </div>
 </footer>
+
+<!-- Export Modal -->
+<div class="export-modal-overlay" id="exportModalOverlay">
+  <div class="export-modal">
+    <div class="export-modal-header">
+      <span class="export-modal-title">Session Export</span>
+      <button class="export-modal-close" onclick="closeExportModal()">✕</button>
+    </div>
+    <div class="export-modal-body">
+      <textarea id="exportModalText" readonly></textarea>
+    </div>
+    <div class="export-modal-footer">
+      <span class="export-modal-hint">Tap inside the box to select all, or use Copy below</span>
+      <button class="btn-copy-primary" onclick="copyExportText()" id="copyExportBtn">Copy to Clipboard</button>
+      <button onclick="downloadExportText()">Download .md</button>
+      <button onclick="closeExportModal()">Close</button>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
