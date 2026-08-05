@@ -12,12 +12,6 @@
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
   gtag('config', 'AW-18085846918');
-  gtag('event', 'conversion', {
-    'send_to': 'AW-18085846918',
-    'value': 19.99,
-    'currency': 'USD',
-    'transaction_id': ''
-  });
 </script>
 <style>
   body { background:#0d0f12; color:#e2e8f0; font-family:'Georgia',serif; display:flex; align-items:center; justify-content:center; min-height:100vh; margin:0; padding:20px; }
@@ -59,6 +53,7 @@
 
 <script>
   let currentCode = '';
+  let purchaseTracked = false;
 
   async function loadCode() {
     const params = new URLSearchParams(window.location.search);
@@ -69,6 +64,22 @@
       const data = await res.json();
       currentCode = data.code || '';
       document.getElementById('accessCode').textContent = currentCode || 'Error loading code.';
+
+      // Fire the conversion event once, using the real amount if the
+      // function returns one. Falls back to 9.99 (single-tool monthly
+      // price) if the backend didn't return an amount for some reason.
+      if (!purchaseTracked && currentCode) {
+        const amount = typeof data.amount === 'number' ? data.amount : 9.99;
+        if (typeof gtag !== 'undefined') {
+          gtag('event', 'conversion', {
+            'send_to': 'AW-18085846918',
+            'value': amount,
+            'currency': 'USD',
+            'transaction_id': sessionId
+          });
+        }
+        purchaseTracked = true;
+      }
     } catch(e) {
       document.getElementById('accessCode').textContent = 'Error loading code.';
     }
