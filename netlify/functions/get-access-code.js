@@ -36,6 +36,10 @@ exports.handler = async (event) => {
     const code = 'TAR-' + session.id.slice(-8).toUpperCase();
     const customerEmail = session.customer_details?.email;
 
+    // Stripe reports amounts in cents -- convert to a normal dollar figure
+    // so the frontend can report the real value to Meta/Google conversion tracking
+    const amount = typeof session.amount_total === 'number' ? session.amount_total / 100 : null;
+
     if (customerEmail) {
       await transporter.sendMail({
         from: 'The Writers Precinct <jeff@asktheprecinct.com>',
@@ -66,7 +70,7 @@ exports.handler = async (event) => {
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ code })
+      body: JSON.stringify({ code, amount })
     };
 
   } catch (err) {
