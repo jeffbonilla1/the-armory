@@ -1079,12 +1079,16 @@ async function sendQuestion() {
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
     let hitTokenLimit = false;
+    let finished = false;   // true once the answer reports it completed
+    let buffer = '';        // holds a partial line split across network chunks
 
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
-      const chunk = decoder.decode(value, { stream: true });
-      for (const line of chunk.split('\n')) {
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop();  // last piece may be incomplete; keep it for next chunk
+      for (const line of lines) {
         if (line.startsWith('data: ')) {
           const data = line.slice(6).trim();
           if (data === '[DONE]') break;
@@ -1098,13 +1102,18 @@ async function sendQuestion() {
             if (parsed.type === 'message_delta' && parsed.delta?.stop_reason === 'max_tokens') {
               hitTokenLimit = true;
             }
+            if (parsed.type === 'message_stop') finished = true;
           } catch(e) {}
         }
       }
     }
 
     if (!rawText) rawText = 'No response received.';
-    if (hitTokenLimit) rawText += '\n\n*— Response trimmed at token limit. Try a more focused question. —*';
+    if (hitTokenLimit) {
+      rawText += '\n\n*This answer hit its length limit. For the full picture, try Scene Ready mode or ask about one part at a time.*';
+    } else if (!finished && rawText !== 'No response received.') {
+      rawText += '\n\n*This answer was cut short by a connection limit. Try Scene Ready mode, or ask about one part at a time (for example targeting, then launch, then impact).*';
+    }
 
     const renderedHtml = parseResponse(rawText, question, weapon, theater);
     const session = { question, weapon, theater, format, rawText, renderedHtml, timestamp: Date.now() };
@@ -1204,6 +1213,19 @@ async function validateCode() {
 // Only removes the code on a clear "not valid" answer; a network or
 // server hiccup leaves the paying user alone.
 (async function recheckSavedCode() {
+  // A link like askthearmory.com/?code=TAR-HOLMES activates the code
+  // directly, so the person never has to hit the paywall first.
+  const urlCode = new URLSearchParams(location.search).get('code');
+  if (urlCode) {
+    history.replaceState(null, '', location.pathname);
+    try {
+      const c = urlCode.trim().toUpperCase();
+      const r = await fetch(`/.netlify/functions/validate-code?code=${encodeURIComponent(c)}`);
+      const d = await r.json();
+      if (d.valid) localStorage.setItem('armory_access_code', c);
+    } catch (e) { /* ignore; they can still enter it on the paywall */ }
+  }
+
   const saved = localStorage.getItem('armory_access_code');
   if (!saved) return;
   try {
