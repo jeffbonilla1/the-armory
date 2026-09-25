@@ -1199,6 +1199,26 @@ async function validateCode() {
   }
 }
 
+// Re-check a saved access code every time the page loads, so expired
+// guest codes and canceled subscriptions actually lose access.
+// Only removes the code on a clear "not valid" answer; a network or
+// server hiccup leaves the paying user alone.
+(async function recheckSavedCode() {
+  const saved = localStorage.getItem('armory_access_code');
+  if (!saved) return;
+  try {
+    const res = await fetch(`/.netlify/functions/validate-code?code=${encodeURIComponent(saved)}`);
+    if (!res.ok) return;
+    const data = await res.json();
+    if (data.valid === false) {
+      localStorage.removeItem('armory_access_code');
+      showPaywall();
+      const err = document.getElementById('codeError');
+      if (err) err.textContent = 'Your access code has expired or is no longer active.';
+    }
+  } catch (e) { /* offline or server error: keep access */ }
+})();
+
 let _exportMd = '';
 
 function exportSession() {
