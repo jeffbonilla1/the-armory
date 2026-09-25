@@ -7,6 +7,13 @@ const VIP_CODES = new Set([
   'TAR-PREVIEW'
 ]);
 
+// Time-limited guest codes: code -> expiration (Pacific time).
+// After the date passes the code stops working automatically.
+// To shut one off early, delete its line and redeploy.
+const EXPIRING_CODES = {
+  'TAR-HOLMES': '2026-10-25T23:59:59-07:00'  // J.F. Holmes, Cannon Publishing (30 days)
+};
+
 exports.handler = async (event) => {
   const code = event.queryStringParameters?.code;
 
@@ -25,6 +32,16 @@ exports.handler = async (event) => {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ valid: true })
+    };
+  }
+
+  // Time-limited guest codes
+  if (EXPIRING_CODES[upperCode]) {
+    const stillValid = Date.now() < new Date(EXPIRING_CODES[upperCode]).getTime();
+    return {
+      statusCode: 200,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ valid: stillValid })
     };
   }
 
