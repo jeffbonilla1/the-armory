@@ -11,7 +11,9 @@ const VIP_CODES = new Set([
 // After the date passes the code stops working automatically.
 // To shut one off early, delete its line and redeploy.
 const EXPIRING_CODES = {
-  'TAR-HOLMES': '2026-10-25T23:59:59-07:00'  // J.F. Holmes, Cannon Publishing (30 days)
+  'TAR-HOLMES': '2026-10-25T23:59:59-07:00', // J.F. Holmes, Cannon Publishing (30 days)
+  'TAR-HAGAN':  '2026-12-25T23:59:59-08:00', // Al Hagan, Cannon author / tester (3 months)
+  'TAR-CHASE':  '2026-12-25T23:59:59-08:00'  // Cole Chase, Shadowfast author (3 months)
 };
 
 exports.handler = async (event) => {
