@@ -169,6 +169,115 @@ select:focus { border-color: var(--accent); }
 .btn-export:hover { border-color: var(--accent); color: var(--accent); }
 
 /* ═══════════ EXPORT MODAL ═══════════ */
+/* =========== MEMBER CODE LINK + MODAL =========== */
+.member-link {
+  margin-left: 16px;
+  background: transparent;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+.member-link:hover { background: var(--accent); color: #040810; }
+.member-modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(5,7,9,0.82);
+  z-index: 1100;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.member-modal-overlay.open { display: flex; }
+.member-modal {
+  background: var(--surface);
+  border: 1px solid var(--border-bright);
+  border-radius: 12px;
+  width: 100%;
+  max-width: 420px;
+  padding: 32px 28px;
+  text-align: center;
+  position: relative;
+}
+.member-modal-close {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+.member-modal-close:hover { color: var(--accent); }
+.member-modal h3 {
+  font-family: 'Bebas Neue', cursive;
+  font-size: 1.6rem;
+  letter-spacing: 0.1em;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.member-modal p {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  line-height: 1.6;
+  margin-bottom: 18px;
+}
+.member-modal input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border-bright);
+  border-radius: 6px;
+  color: var(--text);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 14px;
+  padding: 12px 16px;
+  text-align: center;
+  letter-spacing: 0.08em;
+  outline: none;
+  margin-bottom: 10px;
+}
+.member-modal input:focus { border-color: var(--accent); }
+.member-modal .member-error {
+  color: var(--red);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  min-height: 18px;
+  margin-bottom: 12px;
+}
+.member-modal .member-submit {
+  width: 100%;
+  background: var(--accent);
+  color: #040810;
+  border: none;
+  border-radius: 6px;
+  font-family: 'Bebas Neue', cursive;
+  font-size: 1.05rem;
+  letter-spacing: 0.1em;
+  padding: 12px;
+  cursor: pointer;
+}
+.member-modal .member-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+.member-modal .member-help {
+  margin-top: 14px;
+  margin-bottom: 0;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+}
+.member-modal .member-help a { color: var(--accent); }
+@media (max-width: 768px) {
+  .member-link { margin-left: 8px; font-size: 0.58rem; padding: 4px 8px; }
+}
+
 .export-modal-overlay {
   display: none;
   position: fixed;
@@ -586,6 +695,7 @@ textarea::placeholder { color: var(--text-muted); font-style: italic; }
   <div class="app-title"><a href="#" style="text-decoration:none;color:inherit;">The Armory</a></div>
   <div class="app-subtitle">Weapons Intelligence for Fiction Writers</div>
   <a class="bindery-link" href="https://thewritersprecinct.com">◂ The Writers Precinct</a>
+  <button class="member-link" id="memberLink" onclick="openMemberModal()">Member? Enter code</button>
 </div>
 
 <!-- Toolbar -->
@@ -1331,6 +1441,68 @@ function clearAll() {
     <a href="https://thewritersprecinct.com" target="_blank" style="font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:600; letter-spacing:0.5px; text-decoration:none; background:var(--accent); color:#fff; padding:6px 14px; border-radius:6px; transition:opacity 0.2s;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">Explore the Full Suite →</a>
   </div>
 </footer>
+
+<div class="member-modal-overlay" id="memberModalOverlay" onclick="if(event.target===this)closeMemberModal()">
+  <div class="member-modal">
+    <button class="member-modal-close" onclick="closeMemberModal()" aria-label="Close">X</button>
+    <h3>Member Access</h3>
+    <p>Already subscribed? Enter your access code to unlock unlimited questions. No free questions needed.</p>
+    <input id="memberCodeInput" type="text" placeholder="Enter code (TAR-XXXXXXXX)" autocomplete="off" autocapitalize="characters" onkeydown="if(event.key==='Enter'){event.stopPropagation();submitMemberCode();}">
+    <div class="member-error" id="memberCodeError"></div>
+    <button class="member-submit" id="memberSubmitBtn" onclick="submitMemberCode()">Unlock Access</button>
+    <p class="member-help">Lost your code? <a href="mailto:jeff@asktheprecinct.com">jeff@asktheprecinct.com</a></p>
+  </div>
+</div>
+
+<script>
+// Hide the member link for people who already have a saved code on this device
+(function() {
+  try {
+    if (localStorage.getItem('armory_access_code')) {
+      var l = document.getElementById('memberLink');
+      if (l) l.style.display = 'none';
+    }
+  } catch (e) {}
+})();
+
+function openMemberModal() {
+  document.getElementById('memberModalOverlay').classList.add('open');
+  document.getElementById('memberCodeError').textContent = '';
+  setTimeout(function() { document.getElementById('memberCodeInput').focus(); }, 50);
+}
+
+function closeMemberModal() {
+  document.getElementById('memberModalOverlay').classList.remove('open');
+}
+
+async function submitMemberCode() {
+  var input = document.getElementById('memberCodeInput');
+  var error = document.getElementById('memberCodeError');
+  var btn = document.getElementById('memberSubmitBtn');
+  var code = input.value.trim().toUpperCase();
+  if (!code) {
+    error.textContent = 'Please enter your access code.';
+    return;
+  }
+  btn.disabled = true;
+  btn.textContent = 'Checking...';
+  error.textContent = '';
+  try {
+    var res = await fetch('/.netlify/functions/validate-code?code=' + encodeURIComponent(code));
+    var data = await res.json();
+    if (data.valid) {
+      localStorage.setItem('armory_access_code', code);
+      location.reload();
+      return;
+    }
+    error.textContent = 'That code was not recognized. Check it and try again.';
+  } catch (e) {
+    error.textContent = 'Connection error. Please try again.';
+  }
+  btn.disabled = false;
+  btn.textContent = 'Unlock Access';
+}
+</script>
 
 <!-- Export Modal -->
 <div class="export-modal-overlay" id="exportModalOverlay">
