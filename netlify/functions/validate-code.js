@@ -67,8 +67,9 @@ exports.handler = async (event) => {
     let match = null;
     let startingAfter = undefined;
     for (let page = 0; page < 5 && !match; page++) {
-      const sessions = await stripe.checkout.sessions.list({
+            const sessions = await stripe.checkout.sessions.list({
         limit: 100,
+        status: 'complete',
         starting_after: startingAfter
       });
 
