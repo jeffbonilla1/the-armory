@@ -16,6 +16,18 @@ const EXPIRING_CODES = {
   'TAR-CHASE':  '2026-12-25T23:59:59-08:00'  // Cole Chase, Shadowfast author (3 months)
 };
 
+// Comp codes: one code works on all four tools. Code -> expiration (Pacific time).
+// After the date passes the code stops working automatically.
+// To shut one off early, delete its line and redeploy.
+const COMP_CODES = {
+  'TWP-MISTY': '2026-12-15T23:59:59-08:00', // Misty M. Beller (Author Nation)
+  'TWP-AN01':  '2026-12-15T23:59:59-08:00', // spare: write who you gave it to here
+  'TWP-AN02':  '2026-12-15T23:59:59-08:00', // spare
+  'TWP-AN03':  '2026-12-15T23:59:59-08:00', // spare
+  'TWP-AN04':  '2026-12-15T23:59:59-08:00', // spare
+  'TWP-AN05':  '2026-12-15T23:59:59-08:00'  // spare
+};
+
 exports.handler = async (event) => {
   const code = event.queryStringParameters?.code;
 
@@ -47,6 +59,16 @@ exports.handler = async (event) => {
     };
   }
 
+  // Comp codes (all four tools, time-limited)
+  if (COMP_CODES[upperCode]) {
+    const stillValid = Date.now() < new Date(COMP_CODES[upperCode]).getTime();
+    return {
+      statusCode: 200,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ valid: stillValid })
+    };
+  }
+
   // Code format check
   if (!upperCode.startsWith('TAR-') || upperCode.length !== 12) {
     return {
@@ -67,7 +89,7 @@ exports.handler = async (event) => {
     let match = null;
     let startingAfter = undefined;
     for (let page = 0; page < 5 && !match; page++) {
-            const sessions = await stripe.checkout.sessions.list({
+      const sessions = await stripe.checkout.sessions.list({
         limit: 100,
         status: 'complete',
         starting_after: startingAfter
