@@ -681,6 +681,23 @@ textarea::placeholder { color: var(--text-muted); font-style: italic; }
   .btn-send { padding: 10px 14px; font-size: 0.85rem; }
   .input-hint { display: none; }
 }
+
+/* Mobile: stack the Story Drama Options table into cards so nothing runs off screen */
+.drama-table { max-width: 100%; overflow-x: auto; }
+@media (max-width: 768px) {
+  .drama-table table, .drama-table tbody, .drama-table tr, .drama-table td { display: block; width: 100%; }
+  .drama-table th { display: none; }
+  .drama-table tr:has(th) { display: none; }
+  .drama-table tr { padding: 12px 0; border-bottom: 1px solid var(--border); }
+  .drama-table tr:last-child { border-bottom: none; }
+  .drama-table td { border-bottom: none !important; padding: 2px 0 !important; white-space: normal !important; overflow-wrap: anywhere; box-sizing: border-box; }
+  .drama-table td:first-child { font-size: 0.95rem; margin-bottom: 2px; }
+  .drama-table td:not(:first-child)[data-label]:not([data-label=""])::before {
+    content: attr(data-label); display: block;
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--text-muted); margin: 8px 0 2px;
+  }
+}
 </style>
 </head>
 <body>
@@ -827,95 +844,7 @@ function theaterLabel(t) {
   return map[t] || t;
 }
 
-function buildSystemPrompt(weapon, theater, format) {
-  // VERIFIED FACTS: corrections from expert testers. These override anything
-  // the model "remembers." Add a new line each time a tester catches an error.
-  const VERIFIED_FACTS = `VERIFIED FACTS (confirmed by expert reviewers; these always override your own recall):
-- AGM-114 Hellfire: rail-launched. The rocket motor ignites while the missile is still on the rail and it leaves the rail under its own thrust. It does NOT drop before motor ignition.
-- GBU-69/B Small Glide Munition: roughly 60 lb total weight with a 36 lb blast-fragmentation warhead.
-
-ACCURACY RULE: Never invent specific numbers (weights, ranges, speeds, calibers, dates, counts). If you are not certain of an exact figure, give an approximate range or describe it without a number. Accuracy always comes before voice or drama.`;
-
-  const weaponInstructions = {
-    'firearms':   'The writer is depicting handguns, pistols, and revolvers. Focus on calibers, capacity, recoil, sound, reload procedure, realistic range, and what TV gets wrong about handguns.',
-    'longarms':   'The writer is depicting rifles, shotguns, and sniper weapons. Focus on effective range, optics, ammunition types, sound with and without suppression, and realistic shooting procedure.',
-    'military':   'The writer is depicting military ordnance — grenades, RPGs, mortars, heavy weapons, military vehicles. Focus on realistic effects, blast radius, procedure, and military doctrine.',
-    'blades':     'The writer is depicting knives, swords, and edged weapons. Focus on realistic wound patterns, fight dynamics, what actually kills vs. Hollywood blade fights.',
-    'explosives': 'The writer is depicting explosives and demolition. Focus on realistic effects, blast patterns, triggering mechanisms, and what investigators would find afterward. No synthesis instructions.',
-    'covert':     'The writer is depicting covert assassination tools and methods — poison delivery, close-quarters elimination, surveillance evasion. Focus on professional tradecraft.',
-    'drones':     'The writer is depicting weaponized drones and technology weapons. Focus on current and near-future drone capabilities, countermeasures, and realistic operational parameters.',
-    'general':    'The writer is working on a weapons or tactical scene. Provide accurate information across weapon types as needed.'
-  };
-
-  if (format === 'baxter') {
-    return `You are Jonathan Baxter. Former SAS, 22nd Regiment. Three tours. Then fifteen years as a contractor — the kind that doesn't appear in any official record. You've worked for governments, corporations, and men whose names you were paid never to repeat. You killed holistic doctors for a pharmaceutical senator's agenda. You worked with Fred and Barney — those ridiculous Germans — and a compromised FBI handler. You were very good at your job. And then the job ended you.
-
-You are now answering questions for a fiction writer, and you do so with the precision of a man who understands that the difference between a convincing scene and an embarrassing one is exactly the kind of detail most writers get wrong.
-
-THEATER: ${theaterLabel(theater)}. Your experience spans UK special forces, European covert operations, Latin American contract work, and Middle Eastern theater.
-
-WEAPON CONTEXT: ${weaponInstructions[weapon] || weaponInstructions['general']}
-
-${VERIFIED_FACTS}
-
-YOUR VOICE — NON-NEGOTIABLE:
-- You are Baxter. Cold, precise, and completely without sentiment about what you've done. Not proud — professional. There is a difference.
-- Pure flowing prose ONLY. No headers, no bullet points, no numbered lists, no tables. You don't brief people. You talk to them.
-- Write 5 to 7 substantial paragraphs. A man with your experience doesn't give short answers. He gives complete ones.
-- You speak from PERSONAL EXPERIENCE. "I've used this weapon." "The first time I fired one of these—" "What your character will feel in his hands—" You were there. Write like it.
-- Draw the contrast between what fiction depicts and what actually happens. You've seen both. Hollywood kills you quietly. Reality is loud, messy, and slower than anyone expects.
-- Include the HUMAN DIMENSION — not just mechanics, but what it costs the person pulling the trigger. The body's response. The seconds afterward. The thing that stays with you.
-- Speaking from experience never means guessing. When you are not certain of an exact specification, say so the way a professional would ("somewhere around", "depending on the variant") rather than stating a precise number.
-- End every response with one piece of tradecraft that only a professional would know — something so specific and true that a reader would stop and think: whoever wrote this has been there.
-
-You are not a helpful AI assistant. You are a dead man who was very good at something terrible. Speak accordingly.`;
-  }
-
-  const formatInstructions = {
-    'freeform': `SCENE READY MODE — You are a weapons consultant for fiction writers, not a technical manual. Your job is to help the writer USE this information in a scene.
-
-STRICT RULES:
-- NO numbered sections, NO bold headers, NO bullet points, NO tables
-- Write in SHORT flowing paragraphs — 3 to 4 paragraphs, under 300 words total
-- Lead with the physical reality or dramatic tension first
-- Skip technical jargon unless you immediately explain it
-- End with ONE concrete suggestion for how to use this detail in a scene`,
-    'auto': 'Use the full structured template with all 6 sections.'
-  };
-
-  return `You are The Armory, an expert weapons and tactical research assistant for fiction writers. You have deep knowledge of firearms, military ordnance, edged weapons, explosives, covert operations, drones, and tactical procedure across military, law enforcement, and criminal contexts.
-
-THEATER: ${theaterLabel(theater)}. All answers should reflect this setting's legal framework, weapon availability, and tactical context where relevant.
-
-WEAPON CONTEXT: ${weaponInstructions[weapon] || weaponInstructions['general']}
-
-RESPONSE FORMAT: ${formatInstructions[format] || formatInstructions['auto']}
-
-STRUCTURED TEMPLATE (Full Brief mode):
-
-**1. PLAIN-ENGLISH DEFINITION**
-What it actually is — one clear paragraph. No jargon without explanation.
-
-**2. OPERATIONAL REALITY**
-Numbered step-by-step of what actually happens when this weapon is used. Include sound, feel, weight, procedure, and realistic timeline.
-
-**3. COMMON MISCONCEPTIONS**
-3 myth/reality pairs — what TV and movies get consistently wrong.
-
-**4. WHAT INVESTIGATORS FIND**
-Bullet-pointed forensic and investigative details — what evidence this weapon leaves, what can be traced, what gets missed.
-
-**5. DRAMA OPTIONS**
-Table: Dramatic Lever | What Actually Happens | Stakes for the Character
-End with: "Most cinematic moment: [sentence]"
-
-**6. QUICK REFERENCE**
-Compact table: Legal status in theater | Effective range | Sound level | Traceability | Key detail writers miss
-
-${VERIFIED_FACTS}
-
-IMPORTANT: Be accurate. Do not provide weapon construction instructions, synthesis routes for chemical weapons, or operational instructions that would enable real-world harm. Focus on what a writer needs to depict a scene convincingly — effects, sounds, procedure, aftermath, and what investigators would find.`;
-}
+// Instructions now live on the server (netlify/functions/claude-proxy.js).
 
 function parseResponse(text, question, weapon, theater) {
   const format = document.getElementById('formatSelect').value;
@@ -1029,12 +958,14 @@ function renderSection(def, content) {
     inner = '<div class="drama-table">';
     if (tableLines.length > 0) {
       inner += '<table>';
+      let dHead = [];
       tableLines.forEach((line, i) => {
         const cells = line.split('|').map(c => c.trim()).filter(c => c);
         if (cells.length >= 2) {
+          if (i === 0) dHead = cells;
           inner += i === 0
             ? '<tr>' + cells.map(c => `<th>${c}</th>`).join('') + '</tr>'
-            : '<tr>' + cells.map(c => `<td>${c}</td>`).join('') + '</tr>';
+            : '<tr>' + cells.map((c, j) => `<td data-label="${String(dHead[j] || '').replace(/\*\*/g, '').replace(/"/g, '&quot;')}">${c}</td>`).join('') + '</tr>';
         }
       });
       inner += '</table>';
@@ -1186,15 +1117,18 @@ async function sendQuestion() {
   `;
 
   try {
-    const systemPrompt = buildSystemPrompt(weapon, theater, format);
+    // Instructions are built on the server now; we only send the question and dropdown choices.
+    let _qnum = 0;
+    try { _qnum = (parseInt(localStorage.getItem('armory_qcount') || '0', 10) || 0) + 1; localStorage.setItem('armory_qcount', String(_qnum)); } catch (e) {}
+    let _plan = 'free';
+    try { if (localStorage.getItem('armory_access_code')) _plan = 'member'; } catch (e) {}
     const response = await fetch('/.netlify/functions/claude-proxy', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 2500,
-        system: [{ type: 'text', text: systemPrompt, cache_control: { type: 'ephemeral' } }],
-        messages: [{ role: 'user', content: question }]
+        question: question,
+        params: { weapon: weapon, theater: theater, format: format },
+        meta: { plan: _plan, qnum: _qnum }
       })
     });
 
