@@ -142,6 +142,27 @@ async function logQuestion(row) {
   }
 }
 
+// ---------- Safety cap: max questions per hour from one connection ----------
+// Protects the bill if someone tries to call this function directly in a loop.
+// Uses the same Upstash Redis as check-guest. If Redis isn't set up, the cap is skipped.
+const HOURLY_CAP = 40;
+async function overHourlyCap(event) {
+  const url = process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  if (!url || !token) return false;
+  try {
+    const ip = (event.headers['x-forwarded-for'] || '').split(',')[0].trim() || event.headers['client-ip'] || 'unknown';
+    let h = 0; for (let i = 0; i < ip.length; i++) { h = (h << 5) - h + ip.charCodeAt(i); h |= 0; }
+    const key = 'rate:' + TOOL.replace(/W/g, '') + ':' + Math.abs(h) + ':' + Math.floor(Date.now() / 3600000);
+    const r = await fetch(url + '/incr/' + key, { method: 'POST', headers: { Authorization: 'Bearer ' + token } });
+    const n = (await r.json()).result;
+    if (n === 1) await fetch(url + '/expire/' + key + '/3700', { method: 'POST', headers: { Authorization: 'Bearer ' + token } });
+    return n > HOURLY_CAP;
+  } catch (e) {
+    return false;
+  }
+}
+
 exports.handler = stream(async (event) => {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: JSON.stringify({ error: 'Method not allowed' }) };
@@ -150,6 +171,10 @@ exports.handler = stream(async (event) => {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
     return { statusCode: 500, body: JSON.stringify({ error: 'API key not configured on server.' }) };
+  }
+
+  if (await overHourlyCap(event)) {
+    return { statusCode: 429, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ error: 'Too many questions in the last hour. Please try again later.' }) };
   }
 
   try {
