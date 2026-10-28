@@ -145,15 +145,16 @@ async function logQuestion(row) {
 // ---------- Safety cap: max questions per hour from one connection ----------
 // Protects the bill if someone tries to call this function directly in a loop.
 // Uses the same Upstash Redis as check-guest. If Redis isn't set up, the cap is skipped.
-const HOURLY_CAP = 40;
+// Change anytime in Netlify: Site configuration > Environment variables > HOURLY_CAP (0 turns the cap off).
+const HOURLY_CAP = parseInt(process.env.HOURLY_CAP || '100', 10);
 async function overHourlyCap(event) {
   const url = process.env.UPSTASH_REDIS_REST_URL;
   const token = process.env.UPSTASH_REDIS_REST_TOKEN;
-  if (!url || !token) return false;
+  if (!url || !token || !(HOURLY_CAP > 0)) return false;
   try {
     const ip = (event.headers['x-forwarded-for'] || '').split(',')[0].trim() || event.headers['client-ip'] || 'unknown';
     let h = 0; for (let i = 0; i < ip.length; i++) { h = (h << 5) - h + ip.charCodeAt(i); h |= 0; }
-    const key = 'rate:' + TOOL.replace(/W/g, '') + ':' + Math.abs(h) + ':' + Math.floor(Date.now() / 3600000);
+    const key = 'rate:' + TOOL.replace(/\W/g, '') + ':' + Math.abs(h) + ':' + Math.floor(Date.now() / 3600000);
     const r = await fetch(url + '/incr/' + key, { method: 'POST', headers: { Authorization: 'Bearer ' + token } });
     const n = (await r.json()).result;
     if (n === 1) await fetch(url + '/expire/' + key + '/3700', { method: 'POST', headers: { Authorization: 'Bearer ' + token } });
