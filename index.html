@@ -790,6 +790,7 @@ textarea::placeholder { color: var(--text-muted); font-style: italic; }
         <div class="input-hint">Enter to send · Shift+Enter for new line · Max 800 characters</div>
         <div id="charCounter" style="font-family:'IBM Plex Mono',monospace;font-size:0.6rem;color:var(--text-muted);white-space:nowrap;">800 remaining</div>
       </div>
+      <div class="legal-note" style="max-width:780px;margin:4px auto 0;font-family:'IBM Plex Mono',monospace;font-size:0.6rem;line-height:1.5;color:var(--text-muted);">For fiction research only. Not professional advice. 18+. By asking, you agree to our <a href="https://thewritersprecinct.com/terms" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;">Terms</a> and <a href="https://thewritersprecinct.com/privacy" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;">Privacy Policy</a>.</div>
     </div>
   </div>
 </div>
@@ -1131,6 +1132,14 @@ async function sendQuestion() {
         meta: { plan: _plan, qnum: _qnum }
       })
     });
+
+    if (response.status === 429) {
+      area.innerHTML = `<div style="padding:40px;font-family:'IBM Plex Mono',monospace;font-size:0.8rem;line-height:1.6;"><strong>Lots of questions coming from this connection right now.</strong><br><br>Give it a few minutes and ask again. Your question is still in the box.</div>`;
+      inp.value = question; autoResize(inp);
+      isLoading = false;
+      document.getElementById('sendBtn').disabled = false;
+      return;
+    }
 
     let rawText = '';
     const reader = response.body.getReader();
